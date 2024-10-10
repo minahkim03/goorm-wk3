@@ -28,10 +28,21 @@ public class ExceptionController {
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleException(RuntimeException e,
                                                                HttpServletRequest request) {
-        //구현
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        LOGGER.error("클래스 내 handleException 호출, {}, {}", request.getRequestURI(),
+            e.getMessage());
+
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error type", status.getReasonPhrase());
+        errorResponse.put("code", "400");
+        errorResponse.put("message", e.getMessage());
+
+        return new ResponseEntity<>(errorResponse, headers, status);
     }
 
-    // 예제 10.19
     @GetMapping("/custom")
     public void getCustomException() throws CustomException {
         throw new CustomException(ExceptionClass.EXCEPTION_CLASS, HttpStatus.BAD_REQUEST, "getCustomException 메소드 호출");
